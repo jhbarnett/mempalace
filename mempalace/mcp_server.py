@@ -25,9 +25,9 @@ from datetime import datetime
 
 from .config import MempalaceConfig
 from .version import __version__
+from .client import get_collection as _get_collection, warmup as _warmup
 from .searcher import search_memories
 from .palace_graph import traverse, find_tunnels, graph_stats
-import chromadb
 
 from .knowledge_graph import KnowledgeGraph
 
@@ -37,17 +37,6 @@ logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)
 logger = logging.getLogger("mempalace_mcp")
 
 _config = MempalaceConfig()
-
-
-def _get_collection(create=False):
-    """Return the ChromaDB collection, or None on failure."""
-    try:
-        client = chromadb.PersistentClient(path=_config.palace_path)
-        if create:
-            return client.get_or_create_collection(_config.collection_name)
-        return client.get_collection(_config.collection_name)
-    except Exception:
-        return None
 
 
 def _no_palace():
@@ -761,6 +750,7 @@ def handle_request(request):
 
 def main():
     logger.info("MemPalace MCP Server starting...")
+    _warmup()
     while True:
         try:
             line = sys.stdin.readline()

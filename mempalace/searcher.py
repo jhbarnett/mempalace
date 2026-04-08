@@ -11,6 +11,8 @@ from pathlib import Path
 
 import chromadb
 
+from .client import get_client
+
 logger = logging.getLogger("mempalace_mcp")
 
 
@@ -24,7 +26,7 @@ def search(query: str, palace_path: str, wing: str = None, room: str = None, n_r
     Optionally filter by wing (project) or room (aspect).
     """
     try:
-        client = chromadb.PersistentClient(path=palace_path)
+        client = get_client(palace_path)
         col = client.get_collection("mempalace_drawers")
     except Exception:
         print(f"\n  No palace found at {palace_path}")
@@ -98,7 +100,7 @@ def search_memories(
     Used by the MCP server and other callers that need data.
     """
     try:
-        client = chromadb.PersistentClient(path=palace_path)
+        client = get_client(palace_path)
         col = client.get_collection("mempalace_drawers")
     except Exception as e:
         logger.error("No palace found at %s: %s", palace_path, e)
